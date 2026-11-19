@@ -15,10 +15,32 @@ use Symfony\Component\Routing\Attribute\Route;
 final class VisitorController extends AbstractController
 {
     #[Route(name: 'app_visitor_index', methods: ['GET'])]
-    public function index(VisitorRepository $visitorRepository): Response
+    public function index(Request $request, VisitorRepository $visitorRepository): Response
     {
+        $query = $visitorRepository->createQueryBuilder('x');
+        if ($request->query->get('id') !== null && $request->query->get('id') !== '') {
+            $query->andWhere('x.id LIKE :id')->setParameter('id', '%' . $request->query->get('id') . '%');
+        }
+        if ($request->query->get('firstName') !== null && $request->query->get('firstName') !== '') {
+            $query->andWhere('x.firstName LIKE :firstName')->setParameter('firstName', '%' . $request->query->get('firstName') . '%');
+        }
+        if ($request->query->get('lastName') !== null && $request->query->get('lastName') !== '') {
+            $query->andWhere('x.lastName LIKE :lastName')->setParameter('lastName', '%' . $request->query->get('lastName') . '%');
+        }
+        if ($request->query->get('email') !== null && $request->query->get('email') !== '') {
+            $query->andWhere('x.email LIKE :email')->setParameter('email', '%' . $request->query->get('email') . '%');
+        }
+        $itemsPerPage = max(1, min(100, $request->query->getInt('itemsPerPage', 10)));
+        $page = max(1, $request->query->getInt('page', 1));
+        $total = (clone $query)->select('COUNT(x.id)')->getQuery()->getSingleScalarResult();
+        $items = $query->setFirstResult(($page - 1) * $itemsPerPage)->setMaxResults($itemsPerPage)->getQuery()->getResult();
+
         return $this->render('visitor/index.html.twig', [
-            'visitors' => $visitorRepository->findAll(),
+            'visitors' => $items,
+            'filters' => $request->query->all(),
+            'itemsPerPage' => $itemsPerPage,
+            'page' => $page,
+            'totalPages' => max(1, (int) ceil($total / $itemsPerPage)),
         ]);
     }
 

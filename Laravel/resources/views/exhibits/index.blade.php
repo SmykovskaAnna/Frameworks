@@ -9,7 +9,9 @@
 
     <br><br>
 
-    <table>
+    <form method="GET" style="margin: 1em 0">
+ <label>name: <input name="name" value="{{ request('name') }}"></label>  <label>description: <input name="description" value="{{ request('description') }}"></label>  <label>author: <input name="author" value="{{ request('author') }}"></label>  <label>creation_date: <input name="creation_date" value="{{ request('creation_date') }}"></label>  <label>Кількість на сторінці: <input type="number" name="itemsPerPage" min="1" max="100" value="{{ request('itemsPerPage', 10) }}"></label><button>Фільтрувати</button></form>
+<table>
         <thead>
             <tr>
                 <th>ID</th>
@@ -52,4 +54,5 @@
         </tbody>
     </table>
 
+{{ $exhibits->links() }}
 @endsection

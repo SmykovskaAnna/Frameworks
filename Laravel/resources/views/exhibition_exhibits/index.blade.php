@@ -9,7 +9,9 @@
 
     <br><br>
 
-    <table>
+    <form method="GET" style="margin: 1em 0">
+ <label>display_order: <input name="display_order" value="{{ request('display_order') }}"></label>  <label>exhibition_id: <input name="exhibition_id" value="{{ request('exhibition_id') }}"></label>  <label>exhibit_id: <input name="exhibit_id" value="{{ request('exhibit_id') }}"></label>  <label>Кількість на сторінці: <input type="number" name="itemsPerPage" min="1" max="100" value="{{ request('itemsPerPage', 10) }}"></label><button>Фільтрувати</button></form>
+<table>
         <thead>
             <tr>
                 <th>ID</th>
@@ -52,4 +54,5 @@
         </tbody>
     </table>
 
+{{ $exhibitionExhibits->links() }}
 @endsection

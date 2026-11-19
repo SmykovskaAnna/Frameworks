@@ -1,9 +1,21 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Visitor index{% endblock %}
+{% block title %}Visitor index    <p>Сторінка {{ page }} з {{ totalPages }}</p>
+    {% if page > 1 %}<a href="{{ path('app_visitor_index', filters|merge({'page': page - 1, 'itemsPerPage': itemsPerPage})) }}">Попередня</a>{% endif %}
+    {% if page < totalPages %}<a href="{{ path('app_visitor_index', filters|merge({'page': page + 1, 'itemsPerPage': itemsPerPage})) }}">Наступна</a>{% endif %}
+{% endblock %}
 
 {% block body %}
     <h1>Visitor index</h1>
+
+    <form method="get" style="margin-bottom: 1em">
+        <label>id: <input name="id" value="{{ filters.id|default('') }}"></label>
+        <label>firstName: <input name="firstName" value="{{ filters.firstName|default('') }}"></label>
+        <label>lastName: <input name="lastName" value="{{ filters.lastName|default('') }}"></label>
+        <label>email: <input name="email" value="{{ filters.email|default('') }}"></label>
+        <label>itemsPerPage: <input type="number" name="itemsPerPage" min="1" max="100" value="{{ itemsPerPage }}"></label>
+        <button type="submit">Фільтрувати</button> <a href="{{ path('app_visitor_index') }}">Очистити</a>
+    </form>
 
     <table class="table">
         <thead>
@@ -23,7 +35,8 @@
                 <td>{{ visitor.lastName }}</td>
                 <td>{{ visitor.email }}</td>
                 <td>
-                    <a href="{{ path('app_visitor_show', {'id': visitor.id}) }}">show</a>
+                
+    <a href="{{ path('app_visitor_show', {'id': visitor.id}) }}">show</a>
                     <a href="{{ path('app_visitor_edit', {'id': visitor.id}) }}">edit</a>
                 </td>
             </tr>
@@ -36,4 +49,7 @@
     </table>
 
     <a href="{{ path('app_visitor_new') }}">Create new</a>
+    <p>Сторінка {{ page }} з {{ totalPages }}</p>
+    {% if page > 1 %}<a href="{{ path('app_visitor_index', filters|merge({'page': page - 1, 'itemsPerPage': itemsPerPage})) }}">Попередня</a>{% endif %}
+    {% if page < totalPages %}<a href="{{ path('app_visitor_index', filters|merge({'page': page + 1, 'itemsPerPage': itemsPerPage})) }}">Наступна</a>{% endif %}
 {% endblock %}

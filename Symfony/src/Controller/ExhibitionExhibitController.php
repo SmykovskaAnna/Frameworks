@@ -15,10 +15,32 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ExhibitionExhibitController extends AbstractController
 {
     #[Route(name: 'app_exhibition_exhibit_index', methods: ['GET'])]
-    public function index(ExhibitionExhibitRepository $exhibitionExhibitRepository): Response
+    public function index(Request $request, ExhibitionExhibitRepository $exhibitionExhibitRepository): Response
     {
+        $query = $exhibitionExhibitRepository->createQueryBuilder('x');
+        if ($request->query->get('id') !== null && $request->query->get('id') !== '') {
+            $query->andWhere('x.id LIKE :id')->setParameter('id', '%' . $request->query->get('id') . '%');
+        }
+        if ($request->query->get('displayOrder') !== null && $request->query->get('displayOrder') !== '') {
+            $query->andWhere('x.displayOrder LIKE :displayOrder')->setParameter('displayOrder', '%' . $request->query->get('displayOrder') . '%');
+        }
+        if ($request->query->get('exhibitionId') !== null && $request->query->get('exhibitionId') !== '') {
+            $query->andWhere('x.exhibition.id LIKE :exhibitionId')->setParameter('exhibitionId', '%' . $request->query->get('exhibitionId') . '%');
+        }
+        if ($request->query->get('exhibitId') !== null && $request->query->get('exhibitId') !== '') {
+            $query->andWhere('x.exhibit.id LIKE :exhibitId')->setParameter('exhibitId', '%' . $request->query->get('exhibitId') . '%');
+        }
+        $itemsPerPage = max(1, min(100, $request->query->getInt('itemsPerPage', 10)));
+        $page = max(1, $request->query->getInt('page', 1));
+        $total = (clone $query)->select('COUNT(x.id)')->getQuery()->getSingleScalarResult();
+        $items = $query->setFirstResult(($page - 1) * $itemsPerPage)->setMaxResults($itemsPerPage)->getQuery()->getResult();
+
         return $this->render('exhibition_exhibit/index.html.twig', [
-            'exhibition_exhibits' => $exhibitionExhibitRepository->findAll(),
+            'exhibition_exhibits' => $items,
+            'filters' => $request->query->all(),
+            'itemsPerPage' => $itemsPerPage,
+            'page' => $page,
+            'totalPages' => max(1, (int) ceil($total / $itemsPerPage)),
         ]);
     }
 

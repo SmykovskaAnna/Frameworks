@@ -9,7 +9,9 @@
 
     <br><br>
 
-    <table>
+    <form method="GET" style="margin: 1em 0">
+ <label>purchase_date: <input name="purchase_date" value="{{ request('purchase_date') }}"></label>  <label>price: <input name="price" value="{{ request('price') }}"></label>  <label>ticket_type: <input name="ticket_type" value="{{ request('ticket_type') }}"></label>  <label>visitor_id: <input name="visitor_id" value="{{ request('visitor_id') }}"></label>  <label>exhibition_id: <input name="exhibition_id" value="{{ request('exhibition_id') }}"></label>  <label>Кількість на сторінці: <input type="number" name="itemsPerPage" min="1" max="100" value="{{ request('itemsPerPage', 10) }}"></label><button>Фільтрувати</button></form>
+<table>
         <thead>
             <tr>
                 <th>ID</th>
@@ -56,4 +58,5 @@
         </tbody>
     </table>
 
+{{ $tickets->links() }}
 @endsection

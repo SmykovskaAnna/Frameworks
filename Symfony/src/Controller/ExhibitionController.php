@@ -15,10 +15,35 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ExhibitionController extends AbstractController
 {
     #[Route(name: 'app_exhibition_index', methods: ['GET'])]
-    public function index(ExhibitionRepository $exhibitionRepository): Response
+    public function index(Request $request, ExhibitionRepository $exhibitionRepository): Response
     {
+        $query = $exhibitionRepository->createQueryBuilder('x');
+        if ($request->query->get('id') !== null && $request->query->get('id') !== '') {
+            $query->andWhere('x.id LIKE :id')->setParameter('id', '%' . $request->query->get('id') . '%');
+        }
+        if ($request->query->get('name') !== null && $request->query->get('name') !== '') {
+            $query->andWhere('x.name LIKE :name')->setParameter('name', '%' . $request->query->get('name') . '%');
+        }
+        if ($request->query->get('description') !== null && $request->query->get('description') !== '') {
+            $query->andWhere('x.description LIKE :description')->setParameter('description', '%' . $request->query->get('description') . '%');
+        }
+        if ($request->query->get('startDate') !== null && $request->query->get('startDate') !== '') {
+            $query->andWhere('x.startDate LIKE :startDate')->setParameter('startDate', '%' . $request->query->get('startDate') . '%');
+        }
+        if ($request->query->get('endDate') !== null && $request->query->get('endDate') !== '') {
+            $query->andWhere('x.endDate LIKE :endDate')->setParameter('endDate', '%' . $request->query->get('endDate') . '%');
+        }
+        $itemsPerPage = max(1, min(100, $request->query->getInt('itemsPerPage', 10)));
+        $page = max(1, $request->query->getInt('page', 1));
+        $total = (clone $query)->select('COUNT(x.id)')->getQuery()->getSingleScalarResult();
+        $items = $query->setFirstResult(($page - 1) * $itemsPerPage)->setMaxResults($itemsPerPage)->getQuery()->getResult();
+
         return $this->render('exhibition/index.html.twig', [
-            'exhibitions' => $exhibitionRepository->findAll(),
+            'exhibitions' => $items,
+            'filters' => $request->query->all(),
+            'itemsPerPage' => $itemsPerPage,
+            'page' => $page,
+            'totalPages' => max(1, (int) ceil($total / $itemsPerPage)),
         ]);
     }
 

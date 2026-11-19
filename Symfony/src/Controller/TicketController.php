@@ -15,10 +15,38 @@ use Symfony\Component\Routing\Attribute\Route;
 final class TicketController extends AbstractController
 {
     #[Route(name: 'app_ticket_index', methods: ['GET'])]
-    public function index(TicketRepository $ticketRepository): Response
+    public function index(Request $request, TicketRepository $ticketRepository): Response
     {
+        $query = $ticketRepository->createQueryBuilder('x');
+        if ($request->query->get('id') !== null && $request->query->get('id') !== '') {
+            $query->andWhere('x.id LIKE :id')->setParameter('id', '%' . $request->query->get('id') . '%');
+        }
+        if ($request->query->get('purchaseDate') !== null && $request->query->get('purchaseDate') !== '') {
+            $query->andWhere('x.purchaseDate LIKE :purchaseDate')->setParameter('purchaseDate', '%' . $request->query->get('purchaseDate') . '%');
+        }
+        if ($request->query->get('price') !== null && $request->query->get('price') !== '') {
+            $query->andWhere('x.price LIKE :price')->setParameter('price', '%' . $request->query->get('price') . '%');
+        }
+        if ($request->query->get('ticketType') !== null && $request->query->get('ticketType') !== '') {
+            $query->andWhere('x.ticketType LIKE :ticketType')->setParameter('ticketType', '%' . $request->query->get('ticketType') . '%');
+        }
+        if ($request->query->get('visitorId') !== null && $request->query->get('visitorId') !== '') {
+            $query->andWhere('x.visitor.id LIKE :visitorId')->setParameter('visitorId', '%' . $request->query->get('visitorId') . '%');
+        }
+        if ($request->query->get('exhibitionId') !== null && $request->query->get('exhibitionId') !== '') {
+            $query->andWhere('x.exhibition.id LIKE :exhibitionId')->setParameter('exhibitionId', '%' . $request->query->get('exhibitionId') . '%');
+        }
+        $itemsPerPage = max(1, min(100, $request->query->getInt('itemsPerPage', 10)));
+        $page = max(1, $request->query->getInt('page', 1));
+        $total = (clone $query)->select('COUNT(x.id)')->getQuery()->getSingleScalarResult();
+        $items = $query->setFirstResult(($page - 1) * $itemsPerPage)->setMaxResults($itemsPerPage)->getQuery()->getResult();
+
         return $this->render('ticket/index.html.twig', [
-            'tickets' => $ticketRepository->findAll(),
+            'tickets' => $items,
+            'filters' => $request->query->all(),
+            'itemsPerPage' => $itemsPerPage,
+            'page' => $page,
+            'totalPages' => max(1, (int) ceil($total / $itemsPerPage)),
         ]);
     }
 

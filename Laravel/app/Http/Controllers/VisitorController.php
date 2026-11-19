@@ -7,10 +7,16 @@ use Illuminate\Http\Request;
 
 class VisitorController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $visitors = Visitor::all();
-
+        $query = Visitor::query();
+        foreach (['first_name', 'last_name', 'email'] as $field) {
+            if ($request->filled($field)) {
+                $query->where($field, 'like', '%' . $request->input($field) . '%');
+            }
+        }
+        $itemsPerPage = max(1, min(100, (int) $request->input('itemsPerPage', 10)));
+        $visitors = $query->paginate($itemsPerPage)->withQueryString();
         return view('visitors.index', compact('visitors'));
     }
 

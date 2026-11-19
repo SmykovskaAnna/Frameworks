@@ -7,10 +7,16 @@ use Illuminate\Http\Request;
 
 class ExhibitionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $exhibitions = Exhibition::all();
-
+        $query = Exhibition::query();
+        foreach (['name', 'description', 'start_date', 'end_date'] as $field) {
+            if ($request->filled($field)) {
+                $query->where($field, 'like', '%' . $request->input($field) . '%');
+            }
+        }
+        $itemsPerPage = max(1, min(100, (int) $request->input('itemsPerPage', 10)));
+        $exhibitions = $query->paginate($itemsPerPage)->withQueryString();
         return view('exhibitions.index', compact('exhibitions'));
     }
 

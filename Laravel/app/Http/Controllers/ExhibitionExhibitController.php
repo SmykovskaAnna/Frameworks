@@ -9,13 +9,16 @@ use Illuminate\Http\Request;
 
 class ExhibitionExhibitController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $exhibitionExhibits = ExhibitionExhibit::with([
-            'exhibition',
-            'exhibit'
-        ])->get();
-
+        $query = ExhibitionExhibit::with(['exhibition', 'exhibit']);
+        foreach (['display_order', 'exhibition_id', 'exhibit_id'] as $field) {
+            if ($request->filled($field)) {
+                $query->where($field, 'like', '%' . $request->input($field) . '%');
+            }
+        }
+        $itemsPerPage = max(1, min(100, (int) $request->input('itemsPerPage', 10)));
+        $exhibitionExhibits = $query->paginate($itemsPerPage)->withQueryString();
         return view('exhibition_exhibits.index', compact('exhibitionExhibits'));
     }
 
