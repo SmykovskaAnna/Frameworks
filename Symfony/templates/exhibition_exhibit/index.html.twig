@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ExhibitionExhibit index    <p>Сторінка {{ page }} з {{ totalPages }}</p>
+    {% if page > 1 %}<a href="{{ path('app_exhibition_exhibit_index', filters|merge({'page': page - 1, 'itemsPerPage': itemsPerPage})) }}">Попередня</a>{% endif %}
+    {% if page < totalPages %}<a href="{{ path('app_exhibition_exhibit_index', filters|merge({'page': page + 1, 'itemsPerPage': itemsPerPage})) }}">Наступна</a>{% endif %}
+{% endblock %}
+
+{% block body %}
+    <h1>ExhibitionExhibit index</h1>
+
+    <form method="get" style="margin-bottom: 1em">
+        <label>id: <input name="id" value="{{ filters.id|default('') }}"></label>
+        <label>displayOrder: <input name="displayOrder" value="{{ filters.displayOrder|default('') }}"></label>
+        <label>exhibitionId: <input name="exhibitionId" value="{{ filters.exhibitionId|default('') }}"></label>
+        <label>exhibitId: <input name="exhibitId" value="{{ filters.exhibitId|default('') }}"></label>
+        <label>itemsPerPage: <input type="number" name="itemsPerPage" min="1" max="100" value="{{ itemsPerPage }}"></label>
+        <button type="submit">Фільтрувати</button> <a href="{{ path('app_exhibition_exhibit_index') }}">Очистити</a>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>DisplayOrder</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for exhibition_exhibit in exhibition_exhibits %}
+            <tr>
+                <td>{{ exhibition_exhibit.id }}</td>
+                <td>{{ exhibition_exhibit.displayOrder }}</td>
+                <td>
+                
+    <a href="{{ path('app_exhibition_exhibit_show', {'id': exhibition_exhibit.id}) }}">show</a>
+                    <a href="{{ path('app_exhibition_exhibit_edit', {'id': exhibition_exhibit.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_exhibition_exhibit_new') }}">Create new</a>
+    <p>Сторінка {{ page }} з {{ totalPages }}</p>
+    {% if page > 1 %}<a href="{{ path('app_exhibition_exhibit_index', filters|merge({'page': page - 1, 'itemsPerPage': itemsPerPage})) }}">Попередня</a>{% endif %}
+    {% if page < totalPages %}<a href="{{ path('app_exhibition_exhibit_index', filters|merge({'page': page + 1, 'itemsPerPage': itemsPerPage})) }}">Наступна</a>{% endif %}
+{% endblock %}
