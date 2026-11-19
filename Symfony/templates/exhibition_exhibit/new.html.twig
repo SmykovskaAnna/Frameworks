@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New ExhibitionExhibit{% endblock %}
+
+{% block body %}
+    <h1>Create new ExhibitionExhibit</h1>
+
+    {{ include('exhibition_exhibit/_form.html.twig') }}
+
+    <a href="{{ path('app_exhibition_exhibit_index') }}">back to list</a>
+{% endblock %}

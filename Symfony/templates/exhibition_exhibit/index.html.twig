@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ExhibitionExhibit index{% endblock %}
+
+{% block body %}
+    <h1>ExhibitionExhibit index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>DisplayOrder</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for exhibition_exhibit in exhibition_exhibits %}
+            <tr>
+                <td>{{ exhibition_exhibit.id }}</td>
+                <td>{{ exhibition_exhibit.displayOrder }}</td>
+                <td>
+                    <a href="{{ path('app_exhibition_exhibit_show', {'id': exhibition_exhibit.id}) }}">show</a>
+                    <a href="{{ path('app_exhibition_exhibit_edit', {'id': exhibition_exhibit.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_exhibition_exhibit_new') }}">Create new</a>
+{% endblock %}
